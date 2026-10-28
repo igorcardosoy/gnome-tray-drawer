@@ -1,0 +1,17 @@
+{
+  "name": "Tray Drawer",
+  "description": "Toggle visibility of application tray icons with smooth slide animations. Use the middle mouse button to move AppIndicator icons between the panel and drawer.",
+  "uuid": "tray-drawer@igorcardosoy",
+  "shell-version": [
+    "47",
+    "48",
+    "49",
+    "50"
+  ],
+  "version": 1,
+  "url": "https://github.com/igorcardosoy/gnome-tray-drawer",
+  "gettext-domain": "",
+  "donations": {
+    "github": "igorcardosoy"
+  }
+}

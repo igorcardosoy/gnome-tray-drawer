@@ -1,0 +1,31 @@
+.popup-menu.tray-toggle-popup {
+    min-width: 0;
+}
+
+.popup-menu.tray-toggle-popup .popup-menu-content {
+    min-width: 0;
+    padding: 6px;
+}
+
+.tray-toggle-popup-content {
+    min-width: 0;
+    padding: 0;
+}
+
+.tray-toggle-overflow-grid {
+    min-width: 0;
+    padding: 2px;
+}
+
+.tray-toggle-overflow-icon {
+    padding: 4px;
+    border-radius: 6px;
+}
+
+.tray-toggle-overflow-icon:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.tray-toggle-empty {
+    padding: 12px 18px;
+}
