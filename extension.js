@@ -267,8 +267,10 @@ class TrayToggleButton extends PanelMenu.Button {
             return Clutter.EVENT_PROPAGATE;
 
         GObject.signal_stop_emission_by_name(entry.indicator, 'button-release-event');
-        if (entry.menu?.numMenuItems)
+        if (entry.menu?.numMenuItems) {
+            this.menu.close();
             entry.menu.toggle();
+        }
         return Clutter.EVENT_STOP;
     }
 
