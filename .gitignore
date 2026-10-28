@@ -1,0 +1,25 @@
+# Build artifacts
+*.zip
+*.shell-extension.zip
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+screenshots/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node modules (if using any build tools)
+node_modules/
+
+# Temporary files
+*.tmp
+*.log
+
+# Claude artifacts
+.claude/
