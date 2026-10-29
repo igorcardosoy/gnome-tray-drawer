@@ -1,6 +1,7 @@
 import GObject from 'gi://GObject';
 import St from 'gi://St';
 import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
@@ -136,24 +137,28 @@ class TrayToggleButton extends PanelMenu.Button {
     }
 
     _loadPreferences() {
-        try {
-            const [success, contents] = GLib.file_get_contents(this._preferencesPath);
-            if (!success)
-                throw new Error(`Unable to read ${this._preferencesPath}`);
-
-            const preferences = JSON.parse(new TextDecoder().decode(contents));
-            if (!preferences || typeof preferences !== 'object' || Array.isArray(preferences))
-                throw new Error('Tray drawer preferences must be a JSON object');
-
-            for (const [id, hidden] of Object.entries(preferences)) {
-                if (typeof hidden === 'boolean')
-                    this._visibility.set(id, hidden);
-            }
-        } catch (error) {
-            if (error.matches?.(GLib.FileError, GLib.FileError.NOENT))
+        const file = Gio.File.new_for_path(this._preferencesPath);
+        file.load_contents_async(null, (source, result) => {
+            if (this._destroying)
                 return;
-            logError(error, 'Unable to load tray drawer preferences');
-        }
+
+            try {
+                const [, contents] = source.load_contents_finish(result);
+                const preferences = JSON.parse(new TextDecoder().decode(contents));
+                if (!preferences || typeof preferences !== 'object' || Array.isArray(preferences))
+                    throw new Error('Tray drawer preferences must be a JSON object');
+
+                // Keep any choice the user made before this asynchronous load finished.
+                for (const [id, hidden] of Object.entries(preferences)) {
+                    if (typeof hidden === 'boolean' && !this._visibility.has(id))
+                        this._visibility.set(id, hidden);
+                }
+            } catch (error) {
+                if (error.matches?.(Gio.IOErrorEnum, Gio.IOErrorEnum.NOT_FOUND))
+                    return;
+                logError(error, 'Unable to load tray drawer preferences');
+            }
+        });
     }
 
     _savePreferences() {
@@ -205,6 +210,8 @@ class TrayToggleButton extends PanelMenu.Button {
             indicatorReleaseId: 0,
             indicatorPressId: 0,
             middlePressId: 0,
+            dragBeginId: 0,
+            dragEndId: 0,
             draggable: null,
             dragDelegate: null,
             previousDelegate: null,
@@ -225,8 +232,8 @@ class TrayToggleButton extends PanelMenu.Button {
         entry.dragDelegate.getDragActorSource = () => actor;
         indicator._delegate = entry.dragDelegate;
         entry.draggable = DND.makeDraggable(indicator, {restoreOnSuccess: false});
-        entry.draggable.connect('drag-begin', () => this._closeEntryMenu(entry));
-        entry.draggable.connect('drag-end', () => {
+        entry.dragBeginId = entry.draggable.connect('drag-begin', () => this._closeEntryMenu(entry));
+        entry.dragEndId = entry.draggable.connect('drag-end', () => {
             this._clearPressedState(entry);
             GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => this._resetPopupState(entry));
         });
@@ -438,6 +445,14 @@ class TrayToggleButton extends PanelMenu.Button {
     }
 
     _disconnectEntryDrag(entry) {
+        if (entry.dragBeginId) {
+            entry.draggable.disconnect(entry.dragBeginId);
+            entry.dragBeginId = 0;
+        }
+        if (entry.dragEndId) {
+            entry.draggable.disconnect(entry.dragEndId);
+            entry.dragEndId = 0;
+        }
         if (entry.indicator._delegate === entry.dragDelegate)
             entry.indicator._delegate = entry.previousDelegate;
     }
