@@ -37,7 +37,7 @@ mkdir -p "$INSTALL_DIR"
 
 # Copy files
 echo "📋 Copying extension files..."
-cp -f extension.js metadata.json stylesheet.css "$INSTALL_DIR/"
+cp -rf extension.js metadata.json stylesheet.css lib "$INSTALL_DIR/"
 
 echo "✓ Installation complete!"
 echo ""
