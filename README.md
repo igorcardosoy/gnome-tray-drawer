@@ -5,11 +5,12 @@ A GNOME Shell extension that lets you hide application tray icons and open them 
 ## Requirements
 
 - GNOME Shell 47 or later
-- Applications that provide AppIndicator tray icons
+- The [AppIndicator and KStatusNotifierItem Support](https://extensions.gnome.org/extension/615/appindicator-support/) GNOME Shell extension, installed and enabled (`appindicatorsupport@rgcjonas.gmail.com`). Tray Drawer manages the tray icons exposed by this extension.
+- Applications that provide AppIndicator or KStatusNotifierItem tray icons
 
 ## Install
 
-From the project directory, run:
+Install and enable the AppIndicator extension first if it is not already enabled. Then, from the project directory, run:
 
 ```sh
 make install

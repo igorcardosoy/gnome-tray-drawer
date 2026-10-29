@@ -1,6 +1,6 @@
 {
   "name": "Tray Drawer",
-  "description": "Toggle visibility of application tray icons with smooth slide animations. Drag AppIndicator icons between the panel and drawer, or use the middle mouse button to move them.",
+  "description": "Toggle visibility of application tray icons with smooth slide animations. Drag AppIndicator icons between the panel and drawer, or use the middle mouse button to move them. Requires the AppIndicator and KStatusNotifierItem Support extension.",
   "uuid": "tray-drawer@igorcardosoy",
   "shell-version": [
     "47",
@@ -12,6 +12,7 @@
   "url": "https://github.com/igorcardosoy/gnome-tray-drawer",
   "gettext-domain": "",
   "donations": {
-    "github": "igorcardosoy"
+    "github": "igorcardosoy",
+    "buymeacoffee": "igorcardosoy"
   }
 }
