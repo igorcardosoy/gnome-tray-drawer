@@ -5,6 +5,7 @@ import GLib from 'gi://GLib';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
+import * as DND from 'resource:///org/gnome/shell/ui/dnd.js';
 
 const MAX_GRID_COLUMNS = 4;
 
@@ -20,6 +21,7 @@ class TrayToggleButton extends PanelMenu.Button {
 
         this._entries = new Map();
         this._visibility = new Map();
+        this._dropDelegates = [];
         this._preferencesPath = GLib.build_filenamev([
             GLib.get_user_config_dir(),
             'tray-drawer',
@@ -39,10 +41,14 @@ class TrayToggleButton extends PanelMenu.Button {
         this.menu.box.add_child(this._grid);
 
         this._emptyLabel = new St.Label({
-            text: 'No hidden icons - middle-click an app to add it',
+            text: 'No hidden icons - middle-click or drag an app here',
             style_class: 'tray-toggle-empty',
         });
         this.menu.box.add_child(this._emptyLabel);
+        this._installDropDelegate(this._grid);
+        this._installDropDelegate(this._emptyLabel);
+        this._installDropDelegate(this);
+        this._installPanelDropDelegate();
         this.menu.box.add_style_class_name('tray-toggle-popup-content');
         this.menu.actor.add_style_class_name('tray-toggle-popup');
         this._menuStateId = this.menu.connect('open-state-changed', (_menu, open) => {
@@ -199,11 +205,37 @@ class TrayToggleButton extends PanelMenu.Button {
             indicatorReleaseId: 0,
             indicatorPressId: 0,
             middlePressId: 0,
+            draggable: null,
+            dragDelegate: null,
+            previousDelegate: null,
         };
         this._entries.set(actor, entry);
 
         entry.middlePressId = indicator.connect('button-press-event',
             (_indicator, event) => this._onIndicatorMiddlePress(entry, event));
+
+        entry.previousDelegate = indicator._delegate ?? null;
+        entry.dragDelegate = Object.create(entry.previousDelegate);
+        entry.dragDelegate.entry = entry;
+        entry.dragDelegate.getDragActor = () => {
+            const dragActor = new Clutter.Clone({source: actor, reactive: false});
+            dragActor.set_size(...actor.get_size());
+            return dragActor;
+        };
+        entry.dragDelegate.getDragActorSource = () => actor;
+        indicator._delegate = entry.dragDelegate;
+        entry.draggable = DND.makeDraggable(indicator, {restoreOnSuccess: false});
+        entry.draggable.connect('drag-begin', () => this._closeEntryMenu(entry));
+        entry.draggable.connect('drag-end', () => {
+            this._clearPressedState(entry);
+            GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => this._resetPopupState(entry));
+        });
+        if (indicator._indicator && indicator !== actor) {
+            entry.indicatorPressId = indicator.connect('button-press-event',
+                (_indicator, event) => this._onIndicatorPrimaryPress(entry, event));
+            entry.indicatorReleaseId = indicator.connect('button-release-event',
+                (_indicator, event) => this._onIndicatorPrimaryRelease(entry, event));
+        }
 
         if (this._visibility.get(id) !== false)
             this._setIndicatorHidden(entry, true, false);
@@ -229,31 +261,9 @@ class TrayToggleButton extends PanelMenu.Button {
             if (entry.menu) {
                 Main.panel.menuManager.removeMenu(entry.menu);
                 entry.menu.sourceActor = actor;
-                this._indicatorMenuManager.addMenu(entry.menu);
-            }
-
-            if (entry.indicator._indicator) {
-                if (entry.indicator !== actor) {
-                    entry.indicatorPressId = entry.indicator.connect(
-                        'button-press-event',
-                        (_indicator, event) =>
-                            this._onIndicatorPrimaryPress(entry, event));
-                    entry.indicatorReleaseId = entry.indicator.connect(
-                        'button-release-event',
-                        (_indicator, event) =>
-                            this._onIndicatorPrimaryRelease(entry, event));
-                }
+            this._indicatorMenuManager.addMenu(entry.menu);
             }
         } else {
-            if (entry.indicatorPressId) {
-                entry.indicator.disconnect(entry.indicatorPressId);
-                entry.indicatorPressId = 0;
-            }
-            if (entry.indicatorReleaseId) {
-                entry.indicator.disconnect(entry.indicatorReleaseId);
-                entry.indicatorReleaseId = 0;
-            }
-
             actor.remove_style_class_name('tray-toggle-overflow-icon');
             actor.tooltip_text = entry.tooltipText;
             if (entry.menu) {
@@ -310,11 +320,134 @@ class TrayToggleButton extends PanelMenu.Button {
         return Clutter.EVENT_STOP;
     }
 
+    _resetPopupState(entry) {
+        if (this._destroying || this._entries.get(entry.actor) !== entry)
+            return;
+
+        this._closeEntryMenu(entry);
+        if (this.menu.isOpen)
+            this.menu.close();
+    }
+
+    _closeEntryMenu(entry) {
+        if (entry.menu?.isOpen)
+            entry.menu.close();
+    }
+
+    _clearPressedState(entry) {
+        for (const actor of new Set([entry.indicator, entry.actor])) {
+            if (actor instanceof St.Button)
+                actor.fake_release();
+            actor.remove_style_pseudo_class?.('active');
+        }
+    }
+
+    _getDraggedEntry(source) {
+        const entry = source?.entry;
+        return entry && this._entries.get(entry.actor) === entry ? entry : null;
+    }
+
+    _installDropDelegate(actor) {
+        const previousDelegate = actor._delegate ?? null;
+        const delegate = Object.create(previousDelegate);
+        delegate.handleDragOver = (source, ...args) => {
+            const entry = this._getDraggedEntry(source);
+            if (entry && !entry.hidden)
+                return DND.DragMotionResult.MOVE_DROP;
+
+            return previousDelegate?.handleDragOver?.call(previousDelegate, source, ...args) ??
+                DND.DragMotionResult.CONTINUE;
+        };
+        delegate.acceptDrop = (source, dragActor, ...args) => {
+            const entry = this._getDraggedEntry(source);
+            if (entry && !entry.hidden) {
+                this._setIndicatorHidden(entry, true);
+                return true;
+            }
+
+            return previousDelegate?.acceptDrop?.call(
+                previousDelegate, source, dragActor, ...args) ?? false;
+        };
+        actor._delegate = delegate;
+        this._dropDelegates.push({actor, previousDelegate});
+    }
+
+    _installPanelDropDelegate() {
+        const actor = Main.panel;
+        const previousDelegate = actor._delegate ?? null;
+        const delegate = Object.create(previousDelegate);
+        const canDrop = (source, x, y) => {
+            const entry = this._getDraggedEntry(source);
+            return !!entry && (entry.hidden || this._isNearDrawerButton(x, y));
+        };
+        delegate.handleDragOver = (source, dragActor, x, y, time) => {
+            if (canDrop(source, x, y))
+                return DND.DragMotionResult.MOVE_DROP;
+
+            return previousDelegate?.handleDragOver?.call(
+                previousDelegate, source, dragActor, x, y, time) ??
+                DND.DragMotionResult.CONTINUE;
+        };
+        delegate.acceptDrop = (source, dragActor, x, y, time) => {
+            if (canDrop(source, x, y)) {
+                const entry = this._getDraggedEntry(source);
+                const restore = entry.hidden;
+                if (restore)
+                    entry.index = this._getDropIndex();
+                this._setIndicatorHidden(entry, !restore);
+                return true;
+            }
+
+            return previousDelegate?.acceptDrop?.call(
+                previousDelegate, source, dragActor, x, y, time) ?? false;
+        };
+        actor._delegate = delegate;
+        this._dropDelegates.push({actor, previousDelegate});
+    }
+
+    _restoreDropDelegates() {
+        for (const {actor, previousDelegate} of this._dropDelegates)
+            actor._delegate = previousDelegate;
+        this._dropDelegates = [];
+    }
+
+    _isNearDrawerButton(x, y) {
+        const [panelX, panelY] = Main.panel.get_transformed_position();
+        const [panelWidth] = Main.panel.get_transformed_size();
+        const [buttonX, buttonY] = this.get_transformed_position();
+        const [buttonWidth, buttonHeight] = this.get_transformed_size();
+        const scale = panelWidth / Main.panel.width;
+        if (!Number.isFinite(scale) || scale <= 0)
+            return false;
+
+        const centerX = (buttonX - panelX + buttonWidth / 2) / scale;
+        const centerY = (buttonY - panelY + buttonHeight / 2) / scale;
+        const halfWidth = Math.max(buttonWidth / scale / 2, 64);
+        const halfHeight = Math.max(buttonHeight / scale / 2, 24);
+        return Math.abs(x - centerX) <= halfWidth &&
+            Math.abs(y - centerY) <= halfHeight;
+    }
+
+    _getDropIndex() {
+        const [pointerX] = global.get_pointer();
+        const index = this._rightBox.get_children().findIndex(actor => {
+            const [actorX] = actor.get_transformed_position();
+            return actorX + actor.get_width() / 2 > pointerX;
+        });
+        return index < 0 ? this._rightBox.get_n_children() : index;
+    }
+
+    _disconnectEntryDrag(entry) {
+        if (entry.indicator._delegate === entry.dragDelegate)
+            entry.indicator._delegate = entry.previousDelegate;
+    }
+
     _onIndicatorDestroyed(actor) {
         const entry = this._entries.get(actor);
         if (!entry)
             return;
 
+        this._disconnectEntryDrag(entry);
         if (entry.indicatorPressId)
             entry.indicator.disconnect(entry.indicatorPressId);
         if (entry.indicatorReleaseId)
@@ -378,6 +511,7 @@ class TrayToggleButton extends PanelMenu.Button {
         for (const entry of this._entries.values()) {
             const {actor, indicator, destroyId} = entry;
             actor.disconnect(destroyId);
+            this._disconnectEntryDrag(entry);
             if (entry.indicatorPressId)
                 indicator.disconnect(entry.indicatorPressId);
             if (entry.indicatorReleaseId)
@@ -394,6 +528,7 @@ class TrayToggleButton extends PanelMenu.Button {
         this.menu.disconnect(this._menuStateId);
 
         this._restoreIndicators();
+        this._restoreDropDelegates();
         super.destroy();
     }
 });
