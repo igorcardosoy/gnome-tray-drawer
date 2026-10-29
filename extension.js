@@ -79,13 +79,31 @@ class TrayToggleButton extends PanelMenu.Button {
             }
             this._addIndicator(actor, index);
         }
+        this._positionToggleButton();
     }
 
     _getAppIndicator(actor) {
         return Object.entries(Main.panel.statusArea).find(([key, item]) =>
             key.startsWith('appindicator-') &&
-            !key.toLowerCase().includes('clipboard') &&
             item?.container === actor) ?? null;
+    }
+
+    _positionToggleButton() {
+        const children = this._rightBox.get_children()
+            .filter(actor => actor !== this);
+        let position = -1;
+
+        for (const [index, actor] of children.entries()) {
+            if (this._getAppIndicator(actor))
+                position = index + 1;
+        }
+
+        if (position < 0 ||
+            this._rightBox.get_children().indexOf(this) === position)
+            return;
+
+        this._rightBox.remove_child(this);
+        this._rightBox.insert_child_at_index(this, position);
     }
 
     _getIndicatorName(actor, indicator) {
@@ -158,7 +176,10 @@ class TrayToggleButton extends PanelMenu.Button {
 
     _addIndicator(actor, originalIndex) {
         const [legacyId, indicator] = this._getAppIndicator(actor) ?? [];
-        if (this._entries.has(actor) || !indicator || originalIndex < 0)
+        if (this._entries.has(actor) ||
+            !indicator ||
+            legacyId.toLowerCase().includes('clipboard') ||
+            originalIndex < 0)
             return;
 
         const id = this._getIndicatorPreferenceId(legacyId, indicator);
@@ -252,6 +273,7 @@ class TrayToggleButton extends PanelMenu.Button {
             this._savePreferences();
         }
         this._layoutIndicators();
+        this._positionToggleButton();
     }
 
     _onIndicatorPrimaryPress(entry, event) {
@@ -283,10 +305,8 @@ class TrayToggleButton extends PanelMenu.Button {
             return Clutter.EVENT_PROPAGATE;
 
         GObject.signal_stop_emission_by_name(entry.indicator, 'button-release-event');
-        if (entry.menu?.numMenuItems) {
-            this.menu.close();
+        if (entry.menu?.numMenuItems)
             entry.menu.toggle();
-        }
         return Clutter.EVENT_STOP;
     }
 
