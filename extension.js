@@ -99,6 +99,18 @@ class TrayToggleButton extends PanelMenu.Button {
         return role?.replace(/^appindicator-/, '') ?? 'Application';
     }
 
+    _getIndicatorPreferenceId(id, indicator) {
+        const appId = indicator._indicator?.id?.trim();
+        if (appId)
+            return `app:${appId}`;
+
+        const wmClass = indicator._icon?.wm_class?.trim();
+        if (wmClass)
+            return `wm-class:${wmClass}`;
+
+        return id;
+    }
+
     _loadPreferences() {
         try {
             const [success, contents] = GLib.file_get_contents(this._preferencesPath);
@@ -145,9 +157,13 @@ class TrayToggleButton extends PanelMenu.Button {
     }
 
     _addIndicator(actor, originalIndex) {
-        const [id, indicator] = this._getAppIndicator(actor) ?? [];
+        const [legacyId, indicator] = this._getAppIndicator(actor) ?? [];
         if (this._entries.has(actor) || !indicator || originalIndex < 0)
             return;
+
+        const id = this._getIndicatorPreferenceId(legacyId, indicator);
+        if (!this._visibility.has(id) && this._visibility.has(legacyId))
+            this._visibility.set(id, this._visibility.get(legacyId));
 
         const entry = {
             id,

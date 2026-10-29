@@ -27,7 +27,7 @@ You can also install with `./install.sh`.
 
 - Middle-click a tray icon to move it between the panel and the drawer.
 - Click the drawer button in the top panel to open hidden icons.
-- Your icon visibility choices are saved automatically.
+- Your icon visibility choices are saved automatically and preserved when an app restarts.
 
 ## Uninstall
 
