@@ -45,3 +45,14 @@ Open the extension preferences (for example with `gnome-extensions prefs tray-dr
 ```sh
 make uninstall
 ```
+
+## Translations
+
+Translatable strings are marked with `_()` and the gettext domain is defined in `metadata.json`. The catalogs live in `po/`:
+
+```sh
+make pot          # regenerate po/tray-drawer@igorcardosoy.pot after string changes
+make translations # compile po/*.po into locale/
+```
+
+`make install` and `make zip` compile the catalogs automatically (requires `gettext`). Please do not include new languages that you cannot review yourself.
