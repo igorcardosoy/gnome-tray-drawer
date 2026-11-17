@@ -10,6 +10,15 @@
         When disabled, the arrow still changes direction, but without animation.
       </description>
     </key>
+    <key name="rotate-icon" type="b">
+      <default>true</default>
+      <summary>Rotate the drawer button arrow when opening</summary>
+      <description>
+        Flip the drawer button arrow when the drawer is open, so it points back
+        towards the panel edge. This is independent of the animation: when
+        disabled, the arrow keeps pointing in the configured direction.
+      </description>
+    </key>
     <key name="icon-direction" type="s">
       <choices>
         <choice value="auto"/>
