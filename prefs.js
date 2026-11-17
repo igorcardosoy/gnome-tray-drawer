@@ -1,5 +1,6 @@
 import Adw from 'gi://Adw';
 import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
 import Gtk from 'gi://Gtk';
 import {ExtensionPreferences} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 import {
@@ -45,7 +46,7 @@ export default class TrayDrawerPreferences extends ExtensionPreferences {
         if (!this._uiLanguageId) {
             this._uiLanguageId = settings.connect('changed::ui-language', () => {
                 reloadTranslations(settings);
-                this._updateTexts();
+                this._scheduleTextUpdate();
             });
         }
         if (!this._directionChangedId) {
@@ -58,6 +59,10 @@ export default class TrayDrawerPreferences extends ExtensionPreferences {
     }
 
     _disconnectSettings(settings) {
+        if (this._textUpdateId) {
+            GLib.Source.remove(this._textUpdateId);
+            this._textUpdateId = 0;
+        }
         this._page = null;
         this._directionRow = null;
         this._rotateRow = null;
@@ -141,6 +146,18 @@ export default class TrayDrawerPreferences extends ExtensionPreferences {
         this._languageRow = languageRow;
     }
 
+    _scheduleTextUpdate() {
+        // GTK may still be dispatching the row activation that changed the
+        // setting; mutating the ComboRow models inside that signal emission
+        // crashes the list view, so the texts are refreshed on the next idle.
+        if (this._textUpdateId)
+            GLib.Source.remove(this._textUpdateId);
+        this._textUpdateId = GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => {
+            this._textUpdateId = 0;
+            this._updateTexts();
+        });
+    }
+
     _updateDirectionSelection() {
         if (!this._directionRow)
             return;
@@ -168,6 +185,7 @@ export default class TrayDrawerPreferences extends ExtensionPreferences {
         this._animateRow.title = _('Animate the arrow');
         this._animateRow.subtitle = _('Rotate the arrow smoothly when the drawer opens or closes.');
 
+        this._languageRow.title = _('Interface language');
         this._languageRow.subtitle = _('Choose the language used by the extension.');
         const languageOptions = getLanguageOptions();
         this._languageRow.model = Gtk.StringList.new(languageOptions.map(option => option.label));
