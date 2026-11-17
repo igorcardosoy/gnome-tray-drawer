@@ -56,3 +56,12 @@ make translations # compile po/*.po into locale/
 ```
 
 `make install` and `make zip` compile the catalogs automatically (requires `gettext`). Please do not include new languages that you cannot review yourself.
+
+## Development
+
+Install the development dependencies and run the linter:
+
+```sh
+npm install
+make lint
+```

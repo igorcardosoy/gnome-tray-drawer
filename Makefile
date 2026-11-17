@@ -19,7 +19,7 @@ XGETTEXT_NO_GIT = $(shell xgettext --help 2>/dev/null | grep -q -- '--no-git' &&
 # Files to include in the extension
 FILES = extension.js metadata.json stylesheet.css prefs.js schemas $(wildcard locale) lib
 
-.PHONY: all install uninstall zip clean distclean translations pot reload info logs help
+.PHONY: all install uninstall zip clean distclean translations pot lint reload info logs help
 
 # Default target
 all: help
@@ -56,6 +56,10 @@ pot:
 		--package-name="Tray Drawer" --output=$(PO_DIR)/$(DOMAIN).pot \
 		extension.js prefs.js lib/*.js
 	@echo "✓ Template updated: $(PO_DIR)/$(DOMAIN).pot"
+
+# Run ESLint on the extension sources
+lint:
+	@npm run lint
 
 # Create distributable zip file for extensions.gnome.org
 zip: translations clean
@@ -108,6 +112,7 @@ help:
 	@echo "  zip          - Create distributable .zip package for extensions.gnome.org"
 	@echo "  translations - Compile po/*.po into locale/"
 	@echo "  pot          - Regenerate the translation template from the sources"
+	@echo "  lint         - Run ESLint on the extension sources"
 	@echo "  reload       - Re-enable extension (does not reload JavaScript; Wayland requires a new session)"
 	@echo "  info         - Show extension information"
 	@echo "  logs         - Show GNOME Shell logs (filtered for this extension)"
