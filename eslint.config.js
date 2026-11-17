@@ -15,6 +15,8 @@ export default [
             globals: {
                 global: 'readonly',
                 logError: 'readonly',
+                TextDecoder: 'readonly',
+                TextEncoder: 'readonly',
             },
         },
         rules: {
@@ -24,6 +26,7 @@ export default [
             'no-else-return': 'error',
             'no-lonely-if': 'error',
             'no-param-reassign': 'error',
+            'no-undef': 'error',
             'no-unused-vars': ['error', {argsIgnorePattern: '^_'}],
             'no-var': 'error',
             'object-shorthand': 'error',
