@@ -25,6 +25,7 @@ function getLanguageOptions() {
     // Language names are shown in their own language and stay untranslated.
     return [
         {value: 'system', label: _('Automatic (system)')},
+        {value: 'en', label: 'English'},
         {value: 'pt_BR', label: 'Português (Brasil)'},
     ];
 }

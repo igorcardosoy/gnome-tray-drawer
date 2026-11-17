@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tray Drawer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 20:16-0300\n"
+"POT-Creation-Date: 2026-11-17 20:26-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,75 +17,75 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: prefs.js:15
-msgid "Automatic (follow panel)"
-msgstr ""
-
 #: prefs.js:16
-msgctxt "arrow direction"
-msgid "Down"
+msgid "Automatic (follow panel)"
 msgstr ""
 
 #: prefs.js:17
 msgctxt "arrow direction"
-msgid "Up"
+msgid "Down"
 msgstr ""
 
 #: prefs.js:18
 msgctxt "arrow direction"
-msgid "Left"
+msgid "Up"
 msgstr ""
 
 #: prefs.js:19
 msgctxt "arrow direction"
+msgid "Left"
+msgstr ""
+
+#: prefs.js:20
+msgctxt "arrow direction"
 msgid "Right"
 msgstr ""
 
-#: prefs.js:26
+#: prefs.js:27
 msgid "Automatic (system)"
 msgstr ""
 
-#: prefs.js:63 prefs.js:138
+#: prefs.js:82 prefs.js:157
 msgid "Drawer button"
 msgstr ""
 
-#: prefs.js:64 prefs.js:139
+#: prefs.js:83 prefs.js:158
 msgid ""
 "By default the arrow points away from the panel edge, so it follows panels "
 "placed at the top, bottom, left or right."
 msgstr ""
 
-#: prefs.js:69 prefs.js:141
+#: prefs.js:88 prefs.js:160
 msgid "Arrow direction"
 msgstr ""
 
-#: prefs.js:70 prefs.js:142
+#: prefs.js:89 prefs.js:161
 msgid "Choose where the arrow points when the drawer is closed."
 msgstr ""
 
-#: prefs.js:77 prefs.js:146
+#: prefs.js:96 prefs.js:165
 msgid "Rotate the arrow when opening"
 msgstr ""
 
-#: prefs.js:78 prefs.js:147
+#: prefs.js:97 prefs.js:166
 msgid ""
 "Flip the arrow when the drawer is open, so it points back towards the panel "
 "edge."
 msgstr ""
 
-#: prefs.js:84 prefs.js:149
+#: prefs.js:103 prefs.js:168
 msgid "Animate the arrow"
 msgstr ""
 
-#: prefs.js:85 prefs.js:150
+#: prefs.js:104 prefs.js:169
 msgid "Rotate the arrow smoothly when the drawer opens or closes."
 msgstr ""
 
-#: prefs.js:94
+#: prefs.js:113
 msgid "Interface language"
 msgstr ""
 
-#: prefs.js:95 prefs.js:152
+#: prefs.js:114 prefs.js:171
 msgid "Choose the language used by the extension."
 msgstr ""
 

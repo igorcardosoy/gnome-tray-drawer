@@ -24,7 +24,8 @@
       <summary>Interface language</summary>
       <description>
         Language used by the extension user interface. "system" follows the
-        system language; other values select an installed translation catalog.
+        system language; any other value forces that language, falling back to
+        the English strings.
       </description>
     </key>
     <key name="icon-direction" type="s">
