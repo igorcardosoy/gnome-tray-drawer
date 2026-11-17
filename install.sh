@@ -37,7 +37,11 @@ mkdir -p "$INSTALL_DIR"
 
 # Copy files
 echo "📋 Copying extension files..."
-cp -rf extension.js metadata.json stylesheet.css lib "$INSTALL_DIR/"
+cp -rf extension.js metadata.json stylesheet.css prefs.js schemas lib "$INSTALL_DIR/"
+
+# Compile GSettings schema
+echo "⚙️  Compiling settings schema..."
+glib-compile-schemas "$INSTALL_DIR/schemas"
 
 echo "✓ Installation complete!"
 echo ""

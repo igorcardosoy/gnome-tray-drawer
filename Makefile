@@ -6,7 +6,7 @@ BUILD_DIR = build
 ZIP_FILE = $(UUID).shell-extension.zip
 
 # Files to include in the extension
-FILES = extension.js metadata.json stylesheet.css lib
+FILES = extension.js metadata.json stylesheet.css prefs.js schemas lib
 
 .PHONY: all install uninstall zip clean help
 
@@ -18,6 +18,7 @@ install:
 	@echo "Installing extension to $(INSTALL_DIR)..."
 	@mkdir -p $(INSTALL_DIR)
 	@cp -rf $(FILES) $(INSTALL_DIR)/
+	@glib-compile-schemas $(INSTALL_DIR)/schemas
 	@echo "✓ Installation complete!"
 	@echo ""
 	@echo "Next steps:"
@@ -35,6 +36,7 @@ zip: clean
 	@echo "Creating distributable package..."
 	@mkdir -p $(BUILD_DIR)
 	@cp -rf $(FILES) $(BUILD_DIR)/
+	@glib-compile-schemas $(BUILD_DIR)/schemas
 	@cd $(BUILD_DIR) && zip -r ../$(ZIP_FILE) $(FILES)
 	@rm -rf $(BUILD_DIR)
 	@echo "✓ Package created: $(ZIP_FILE)"
