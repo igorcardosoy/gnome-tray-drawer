@@ -19,6 +19,10 @@ msgstr ""
 msgid "Automatic (follow panel)"
 msgstr "Automática (seguir o painel)"
 
+#: prefs.js:13
+msgid "Automatic (system)"
+msgstr "Automático (idioma do sistema)"
+
 #: prefs.js:11
 msgctxt "arrow direction"
 msgid "Down"
@@ -91,3 +95,11 @@ msgstr ""
 #: lib/trayToggleButton.js:38
 msgid "Tray Toggle"
 msgstr "Alternar bandeja"
+
+#: prefs.js:63
+msgid "Interface language"
+msgstr "Idioma da interface"
+
+#: prefs.js:95
+msgid "Choose the language used by the extension."
+msgstr "Escolha o idioma usado pela extensão."

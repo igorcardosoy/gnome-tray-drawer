@@ -39,6 +39,7 @@ Open the extension preferences (for example with `gnome-extensions prefs tray-dr
 - Choose the arrow direction: **Automatic** (default, follows the panel edge) or a fixed direction: down, up, left or right.
 - Enable or disable rotating the arrow when the drawer opens.
 - Enable or disable the arrow animation (only available while the arrow rotates).
+- Choose the interface language: **Automatic (system)** or an installed translation.
 
 ## Uninstall
 
