@@ -59,7 +59,7 @@ pot:
 
 # Run ESLint on the extension sources
 lint:
-	@npm run lint
+	@node node_modules/eslint/bin/eslint.js .
 
 # Create distributable zip file for extensions.gnome.org
 zip: translations clean
