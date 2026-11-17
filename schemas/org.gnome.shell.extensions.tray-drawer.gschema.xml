@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.tray-drawer"
+          path="/org/gnome/shell/extensions/tray-drawer/">
+    <key name="animate-icon" type="b">
+      <default>true</default>
+      <summary>Animate the drawer button icon</summary>
+      <description>
+        Rotate the drawer button arrow smoothly when the drawer opens or closes.
+        When disabled, the arrow still changes direction, but without animation.
+      </description>
+    </key>
+    <key name="rotate-icon" type="b">
+      <default>true</default>
+      <summary>Rotate the drawer button arrow when opening</summary>
+      <description>
+        Flip the drawer button arrow when the drawer is open, so it points back
+        towards the panel edge. This is independent of the animation: when
+        disabled, the arrow keeps pointing in the configured direction.
+      </description>
+    </key>
+    <key name="ui-language" type="s">
+      <default>'system'</default>
+      <summary>Interface language</summary>
+      <description>
+        Language used by the extension user interface. "system" follows the
+        system language; any other value forces that language, falling back to
+        the English strings.
+      </description>
+    </key>
+    <key name="icon-direction" type="s">
+      <choices>
+        <choice value="auto"/>
+        <choice value="down"/>
+        <choice value="up"/>
+        <choice value="left"/>
+        <choice value="right"/>
+      </choices>
+      <default>'auto'</default>
+      <summary>Drawer button arrow direction</summary>
+      <description>
+        Direction the drawer button arrow points to when the drawer is closed.
+        With "auto" the arrow points away from the panel edge, so it follows
+        panels placed at the top, bottom, left or right.
+      </description>
+    </key>
+  </schema>
+</schemalist>

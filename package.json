@@ -1,0 +1,11 @@
+{
+  "name": "gnome-tray-drawer",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "eslint": "^10.0.0"
+  }
+}

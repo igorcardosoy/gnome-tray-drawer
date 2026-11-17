@@ -37,7 +37,24 @@ mkdir -p "$INSTALL_DIR"
 
 # Copy files
 echo "📋 Copying extension files..."
-cp -rf extension.js metadata.json stylesheet.css lib "$INSTALL_DIR/"
+
+# Compile translations before copying
+mkdir -p locale
+if [ -d po ]; then
+    echo "🌐 Compiling translations..."
+    for po in po/*.po; do
+        [ -e "$po" ] || continue
+        lang=$(basename "$po" .po)
+        mkdir -p "locale/$lang/LC_MESSAGES"
+        msgfmt --output-file="locale/$lang/LC_MESSAGES/$UUID.mo" "$po"
+    done
+fi
+
+cp -rf extension.js metadata.json stylesheet.css prefs.js schemas locale lib "$INSTALL_DIR/"
+
+# Compile GSettings schema
+echo "⚙️  Compiling settings schema..."
+glib-compile-schemas "$INSTALL_DIR/schemas"
 
 echo "✓ Installation complete!"
 echo ""

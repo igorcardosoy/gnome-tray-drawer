@@ -9,7 +9,8 @@
     "50",
     "51"
   ],
-  "version": "1.0.4",
+  "settings-schema": "org.gnome.shell.extensions.tray-drawer",
+  "gettext-domain": "tray-drawer@igorcardosoy",
   "url": "https://github.com/igorcardosoy/gnome-tray-drawer",
   "donations": {
     "buymeacoffee": "igorcardosoy"

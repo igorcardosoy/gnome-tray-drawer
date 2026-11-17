@@ -1,6 +1,8 @@
 # Build artifacts
 *.zip
 *.shell-extension.zip
+schemas/gschemas.compiled
+locale/
 
 # Editor files
 .vscode/

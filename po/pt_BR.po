@@ -1,0 +1,105 @@
+# Brazilian Portuguese translation for Tray Drawer.
+# This file is distributed under the same license as the Tray Drawer package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Tray Drawer\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-17 20:26-0300\n"
+"PO-Revision-Date: 2026-11-17 14:50-0300\n"
+"Last-Translator: Igor Cardoso <igorcardosoy@users.noreply.github.com>\n"
+"Language-Team: Portuguese (Brazil)\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: prefs.js:16
+msgid "Automatic (follow panel)"
+msgstr "Automática (seguir o painel)"
+
+#: prefs.js:17
+msgctxt "arrow direction"
+msgid "Down"
+msgstr "Para baixo"
+
+#: prefs.js:18
+msgctxt "arrow direction"
+msgid "Up"
+msgstr "Para cima"
+
+#: prefs.js:19
+msgctxt "arrow direction"
+msgid "Left"
+msgstr "Para a esquerda"
+
+#: prefs.js:20
+msgctxt "arrow direction"
+msgid "Right"
+msgstr "Para a direita"
+
+#: prefs.js:27
+msgid "Automatic (system)"
+msgstr "Automático (idioma do sistema)"
+
+#: prefs.js:82 prefs.js:157
+msgid "Drawer button"
+msgstr "Botão da gaveta"
+
+#: prefs.js:83 prefs.js:158
+msgid ""
+"By default the arrow points away from the panel edge, so it follows panels "
+"placed at the top, bottom, left or right."
+msgstr ""
+"Por padrão, a seta aponta para longe da borda do painel, acompanhando "
+"painéis posicionados no topo, embaixo, à esquerda ou à direita."
+
+#: prefs.js:88 prefs.js:160
+msgid "Arrow direction"
+msgstr "Direção da seta"
+
+#: prefs.js:89 prefs.js:161
+msgid "Choose where the arrow points when the drawer is closed."
+msgstr "Escolha para onde a seta aponta quando a gaveta está fechada."
+
+#: prefs.js:96 prefs.js:165
+msgid "Rotate the arrow when opening"
+msgstr "Girar a seta ao abrir"
+
+#: prefs.js:97 prefs.js:166
+msgid ""
+"Flip the arrow when the drawer is open, so it points back towards the panel "
+"edge."
+msgstr ""
+"Gira a seta quando a gaveta está aberta, para que ela aponte de volta para a "
+"borda do painel."
+
+#: prefs.js:103 prefs.js:168
+msgid "Animate the arrow"
+msgstr "Animar a seta"
+
+#: prefs.js:104 prefs.js:169
+msgid "Rotate the arrow smoothly when the drawer opens or closes."
+msgstr "Gira a seta suavemente quando a gaveta abre ou fecha."
+
+#: prefs.js:113
+msgid "Interface language"
+msgstr "Idioma da interface"
+
+#: prefs.js:114 prefs.js:171
+msgid "Choose the language used by the extension."
+msgstr "Escolha o idioma usado pela extensão."
+
+#: lib/indicatorDiscovery.js:20
+msgid "Application"
+msgstr "Aplicativo"
+
+#: lib/overflowGrid.js:19 lib/trayToggleButton.js:174
+msgid "No hidden icons - middle-click or drag an app here"
+msgstr ""
+"Nenhum ícone oculto - clique com o botão do meio ou arraste um app aqui"
+
+#: lib/trayToggleButton.js:38 lib/trayToggleButton.js:172
+msgid "Tray Toggle"
+msgstr "Alternar bandeja"
