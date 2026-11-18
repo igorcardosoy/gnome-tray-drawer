@@ -1,6 +1,14 @@
-# GNOME Tray Drawer
+<div align="center">
+  <img src="assets/logo.svg" alt="Tray Drawer logo" width="128"/>
+  <h1>GNOME Tray Drawer</h1>
+  <p>A GNOME Shell extension that lets you hide application tray icons and open them from a small drawer.</p>
+  
+</div>
 
-A GNOME Shell extension that lets you hide application tray icons and open them from a small drawer.
+
+## Screenshot
+<img src="assets/screenshot.png" alt="The drawer button in the panel, with the open drawer showing hidden app icons" width="244"/>
+  <p><em>The drawer button in the panel, with the open drawer showing hidden app icons.</em></p>
 
 ## Requirements
 
