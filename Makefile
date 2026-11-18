@@ -66,7 +66,7 @@ zip: translations clean
 	@echo "Creating distributable package..."
 	@mkdir -p $(BUILD_DIR)
 	@cp -rf $(FILES) $(BUILD_DIR)/
-	@glib-compile-schemas $(BUILD_DIR)/schemas
+	@rm -f $(BUILD_DIR)/schemas/gschemas.compiled
 	@cd $(BUILD_DIR) && zip -r ../$(ZIP_FILE) $(FILES)
 	@rm -rf $(BUILD_DIR)
 	@echo "✓ Package created: $(ZIP_FILE)"

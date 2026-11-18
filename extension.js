@@ -10,6 +10,7 @@ export default class TrayToggleExtension extends Extension {
             domain: this.metadata['gettext-domain'] ?? this.uuid,
             dir: this.dir.get_path(),
             settings,
+            onLoaded: () => this._button?.updateTexts(),
         });
         this._button = new TrayToggleButton(settings);
         Main.panel.addToStatusArea('tray-toggle', this._button, 1, 'right');
