@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tray Drawer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 20:26-0300\n"
+"POT-Creation-Date: 2026-11-18 10:54-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,86 +17,74 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: prefs.js:16
+#: prefs.js:10
 msgid "Automatic (follow panel)"
 msgstr ""
 
-#: prefs.js:17
+#: prefs.js:11
 msgctxt "arrow direction"
 msgid "Down"
 msgstr ""
 
-#: prefs.js:18
+#: prefs.js:12
 msgctxt "arrow direction"
 msgid "Up"
 msgstr ""
 
-#: prefs.js:19
+#: prefs.js:13
 msgctxt "arrow direction"
 msgid "Left"
 msgstr ""
 
-#: prefs.js:20
+#: prefs.js:14
 msgctxt "arrow direction"
 msgid "Right"
 msgstr ""
 
-#: prefs.js:27
-msgid "Automatic (system)"
-msgstr ""
-
-#: prefs.js:82 prefs.js:157
+#: prefs.js:44
 msgid "Drawer button"
 msgstr ""
 
-#: prefs.js:83 prefs.js:158
+#: prefs.js:45
 msgid ""
 "By default the arrow points away from the panel edge, so it follows panels "
 "placed at the top, bottom, left or right."
 msgstr ""
 
-#: prefs.js:88 prefs.js:160
+#: prefs.js:50
 msgid "Arrow direction"
 msgstr ""
 
-#: prefs.js:89 prefs.js:161
+#: prefs.js:51
 msgid "Choose where the arrow points when the drawer is closed."
 msgstr ""
 
-#: prefs.js:96 prefs.js:165
+#: prefs.js:63
 msgid "Rotate the arrow when opening"
 msgstr ""
 
-#: prefs.js:97 prefs.js:166
+#: prefs.js:64
 msgid ""
 "Flip the arrow when the drawer is open, so it points back towards the panel "
 "edge."
 msgstr ""
 
-#: prefs.js:103 prefs.js:168
+#: prefs.js:70
 msgid "Animate the arrow"
 msgstr ""
 
-#: prefs.js:104 prefs.js:169
+#: prefs.js:71
 msgid "Rotate the arrow smoothly when the drawer opens or closes."
-msgstr ""
-
-#: prefs.js:113
-msgid "Interface language"
-msgstr ""
-
-#: prefs.js:114 prefs.js:171
-msgid "Choose the language used by the extension."
 msgstr ""
 
 #: lib/indicatorDiscovery.js:20
 msgid "Application"
 msgstr ""
 
-#: lib/overflowGrid.js:19 lib/trayToggleButton.js:174
+#: lib/overflowGrid.js:19
 msgid "No hidden icons - middle-click or drag an app here"
 msgstr ""
 
-#: lib/trayToggleButton.js:38 lib/trayToggleButton.js:172
+#: lib/trayToggleButton.js:38
 msgid "Tray Toggle"
 msgstr ""

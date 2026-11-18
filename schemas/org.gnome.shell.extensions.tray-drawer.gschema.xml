@@ -19,15 +19,6 @@
         disabled, the arrow keeps pointing in the configured direction.
       </description>
     </key>
-    <key name="ui-language" type="s">
-      <default>'system'</default>
-      <summary>Interface language</summary>
-      <description>
-        Language used by the extension user interface. "system" follows the
-        system language; any other value forces that language, falling back to
-        the English strings.
-      </description>
-    </key>
     <key name="icon-direction" type="s">
       <choices>
         <choice value="auto"/>
