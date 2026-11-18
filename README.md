@@ -5,11 +5,6 @@
   
 </div>
 
-
-## Screenshot
-<img src="assets/screenshot.png" alt="The drawer button in the panel, with the open drawer showing hidden app icons" width="244"/>
-  <p><em>The drawer button in the panel, with the open drawer showing hidden app icons.</em></p>
-
 ## Demo
 <div align="center">
   <img src="assets/demo.gif" alt="Tray Drawer in action, hiding and restoring tray icons"/>
