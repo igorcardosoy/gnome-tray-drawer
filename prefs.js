@@ -33,78 +33,125 @@ function getLanguageOptions() {
 
 export default class TrayDrawerPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
-        // Keep the settings object alive for the lifetime of the window.
-        this._settings = window._settings = this.getSettings();
-        const settings = this._settings;
+        const settings = this.getSettings();
+        window._settings = settings;
+
+        // Everything below is scoped to this window and released on close.
+        let updatingTexts = false;
+        let textUpdateId = 0;
+        let group = null;
+        let directionRow = null;
+        let rotateRow = null;
+        let animateRow = null;
+        let languageRow = null;
+
+        const updateDirectionSelection = () => {
+            if (!directionRow)
+                return;
+            directionRow.selected = Math.max(0, ICON_DIRECTIONS
+                .indexOf(settings.get_string('icon-direction')));
+        };
+
+        const updateTexts = () => {
+            if (!group)
+                return;
+
+            updatingTexts = true;
+
+            group.title = _('Drawer button');
+            group.description = _('By default the arrow points away from the panel edge, so it follows panels placed at the top, bottom, left or right.');
+
+            directionRow.title = _('Arrow direction');
+            directionRow.subtitle = _('Choose where the arrow points when the drawer is closed.');
+            directionRow.model = Gtk.StringList.new(getDirectionLabels());
+            updateDirectionSelection();
+
+            rotateRow.title = _('Rotate the arrow when opening');
+            rotateRow.subtitle = _('Flip the arrow when the drawer is open, so it points back towards the panel edge.');
+
+            animateRow.title = _('Animate the arrow');
+            animateRow.subtitle = _('Rotate the arrow smoothly when the drawer opens or closes.');
+
+            languageRow.title = _('Interface language');
+            languageRow.subtitle = _('Choose the language used by the extension.');
+            const languageOptions = getLanguageOptions();
+            languageRow.model = Gtk.StringList.new(languageOptions.map(option => option.label));
+            languageRow.selected = Math.max(0, languageOptions
+                .findIndex(option => option.value === settings.get_string('ui-language')));
+
+            updatingTexts = false;
+        };
+
+        const scheduleTextUpdate = () => {
+            // GTK may still be dispatching the row activation that changed the
+            // setting; mutating the ComboRow models inside that signal emission
+            // crashes the list view, so the texts are refreshed on the next idle.
+            if (textUpdateId)
+                GLib.Source.remove(textUpdateId);
+            textUpdateId = GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => {
+                textUpdateId = 0;
+                updateTexts();
+            });
+        };
+
+        const uiLanguageId = settings.connect('changed::ui-language', () => {
+            reloadTranslations(settings, () => scheduleTextUpdate());
+        });
+        const directionChangedId = settings.connect('changed::icon-direction',
+            updateDirectionSelection);
+
+        window.connect('close-request', () => {
+            if (textUpdateId) {
+                GLib.Source.remove(textUpdateId);
+                textUpdateId = 0;
+            }
+            settings.disconnect(uiLanguageId);
+            settings.disconnect(directionChangedId);
+            group = null;
+            directionRow = null;
+            rotateRow = null;
+            animateRow = null;
+            languageRow = null;
+            return false;
+        });
 
         initTranslations({
             domain: this.metadata['gettext-domain'] ?? this.uuid,
             dir: this.dir.get_path(),
             settings,
+            onLoaded: () => scheduleTextUpdate(),
         });
 
-        if (!this._uiLanguageId) {
-            this._uiLanguageId = settings.connect('changed::ui-language', () => {
-                reloadTranslations(settings);
-                this._scheduleTextUpdate();
-            });
-        }
-        if (!this._directionChangedId) {
-            this._directionChangedId = settings.connect('changed::icon-direction',
-                () => this._updateDirectionSelection());
-        }
-        window.connect('destroy', () => this._disconnectSettings(settings));
-
-        this._fillPage(window, settings);
-    }
-
-    _disconnectSettings(settings) {
-        if (this._textUpdateId) {
-            GLib.Source.remove(this._textUpdateId);
-            this._textUpdateId = 0;
-        }
-        this._page = null;
-        this._directionRow = null;
-        this._rotateRow = null;
-        this._animateRow = null;
-        this._languageRow = null;
-        if (this._uiLanguageId) {
-            settings.disconnect(this._uiLanguageId);
-            this._uiLanguageId = null;
-        }
-        if (this._directionChangedId) {
-            settings.disconnect(this._directionChangedId);
-            this._directionChangedId = null;
-        }
-    }
-
-    _fillPage(window, settings) {
-        if (this._page)
-            window.remove(this._page);
-
         const page = new Adw.PreferencesPage();
-        const group = new Adw.PreferencesGroup({
+        group = new Adw.PreferencesGroup({
             title: _('Drawer button'),
             description: _('By default the arrow points away from the panel edge, so it follows panels placed at the top, bottom, left or right.'),
         });
         page.add(group);
 
-        const directionRow = new Adw.ComboRow({
+        directionRow = new Adw.ComboRow({
             title: _('Arrow direction'),
             subtitle: _('Choose where the arrow points when the drawer is closed.'),
             model: Gtk.StringList.new(getDirectionLabels()),
         });
-        this._updateDirectionSelection(directionRow);
+        updateDirectionSelection();
         group.add(directionRow);
 
-        const rotateRow = new Adw.SwitchRow({
+        directionRow.connect('notify::selected', () => {
+            if (updatingTexts)
+                return;
+            settings.set_string('icon-direction',
+                ICON_DIRECTIONS[directionRow.selected]);
+        });
+
+        rotateRow = new Adw.SwitchRow({
             title: _('Rotate the arrow when opening'),
             subtitle: _('Flip the arrow when the drawer is open, so it points back towards the panel edge.'),
         });
         settings.bind('rotate-icon', rotateRow, 'active', Gio.SettingsBindFlags.DEFAULT);
         group.add(rotateRow);
 
-        const animateRow = new Adw.SwitchRow({
+        animateRow = new Adw.SwitchRow({
             title: _('Animate the arrow'),
             subtitle: _('Rotate the arrow smoothly when the drawer opens or closes.'),
         });
@@ -113,85 +160,22 @@ export default class TrayDrawerPreferences extends ExtensionPreferences {
         settings.bind('rotate-icon', animateRow, 'sensitive', Gio.SettingsBindFlags.GET);
         group.add(animateRow);
 
-        const languageOptions = getLanguageOptions();
-        const languageRow = new Adw.ComboRow({
+        languageRow = new Adw.ComboRow({
             title: _('Interface language'),
             subtitle: _('Choose the language used by the extension.'),
-            model: Gtk.StringList.new(languageOptions.map(option => option.label)),
+            model: Gtk.StringList.new(getLanguageOptions().map(option => option.label)),
         });
-        languageRow.selected = Math.max(0, languageOptions
+        languageRow.selected = Math.max(0, getLanguageOptions()
             .findIndex(option => option.value === settings.get_string('ui-language')));
         group.add(languageRow);
 
         languageRow.connect('notify::selected', () => {
-            if (this._updatingTexts)
+            if (updatingTexts)
                 return;
-            settings.set_string('ui-language',
-                languageOptions[languageRow.selected].value);
-        });
-
-        directionRow.connect('notify::selected', () => {
-            if (this._updatingTexts)
-                return;
-            settings.set_string('icon-direction',
-                ICON_DIRECTIONS[directionRow.selected]);
+            const option = getLanguageOptions()[languageRow.selected];
+            settings.set_string('ui-language', option.value);
         });
 
         window.add(page);
-        this._page = page;
-        this._group = group;
-        this._directionRow = directionRow;
-        this._rotateRow = rotateRow;
-        this._animateRow = animateRow;
-        this._languageRow = languageRow;
-    }
-
-    _scheduleTextUpdate() {
-        // GTK may still be dispatching the row activation that changed the
-        // setting; mutating the ComboRow models inside that signal emission
-        // crashes the list view, so the texts are refreshed on the next idle.
-        if (this._textUpdateId)
-            GLib.Source.remove(this._textUpdateId);
-        this._textUpdateId = GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => {
-            this._textUpdateId = 0;
-            this._updateTexts();
-        });
-    }
-
-    _updateDirectionSelection() {
-        if (!this._directionRow)
-            return;
-        this._directionRow.selected = Math.max(0, ICON_DIRECTIONS
-            .indexOf(this._settings.get_string('icon-direction')));
-    }
-
-    _updateTexts() {
-        if (!this._page)
-            return;
-
-        this._updatingTexts = true;
-
-        this._group.title = _('Drawer button');
-        this._group.description = _('By default the arrow points away from the panel edge, so it follows panels placed at the top, bottom, left or right.');
-
-        this._directionRow.title = _('Arrow direction');
-        this._directionRow.subtitle = _('Choose where the arrow points when the drawer is closed.');
-        this._directionRow.model = Gtk.StringList.new(getDirectionLabels());
-        this._updateDirectionSelection();
-
-        this._rotateRow.title = _('Rotate the arrow when opening');
-        this._rotateRow.subtitle = _('Flip the arrow when the drawer is open, so it points back towards the panel edge.');
-
-        this._animateRow.title = _('Animate the arrow');
-        this._animateRow.subtitle = _('Rotate the arrow smoothly when the drawer opens or closes.');
-
-        this._languageRow.title = _('Interface language');
-        this._languageRow.subtitle = _('Choose the language used by the extension.');
-        const languageOptions = getLanguageOptions();
-        this._languageRow.model = Gtk.StringList.new(languageOptions.map(option => option.label));
-        this._languageRow.selected = Math.max(0, languageOptions
-            .findIndex(option => option.value === this._settings.get_string('ui-language')));
-
-        this._updatingTexts = false;
     }
 }
